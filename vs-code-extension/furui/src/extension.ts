@@ -30,6 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
                             "Successfully Logged In: " +
                                 resultbackend.data.login
                         );
+                        showProfile(resultbackend.data.login);
                         console.log(resultbackend.data);
                         res.send("Logged In");
                     } else {
@@ -155,6 +156,39 @@ export function activate(context: vscode.ExtensionContext) {
         currentPanel.webview.html = getWebviewContent(resultbackend);
     };
 
+    let showProfile = async (username: any) => {
+        let token = context.globalState.get("token");
+        let resultbackendPro = await axios({
+            method: "get",
+            url: `http://localhost:3000/profile/${username}`,
+            headers: {
+                accept: "application/json",
+                Authorization: `token ${token}`,
+            },
+        });
+        console.log(resultbackendPro.data)
+        if (resultbackendPro.data.success){
+            let profilePanel = vscode.window.createWebviewPanel(
+                "Furui",
+                "Furui",
+                vscode.ViewColumn.One,
+                {
+                    enableScripts: true,
+                }
+            );
+            console.log("here")
+            profilePanel.webview.html = getWebviewContentProfile(resultbackendPro);
+            vscode.window.showInformationMessage(
+                "Successfully retrieved user from database"
+            );
+        }
+        else{
+            vscode.window.showInformationMessage(
+                "Could not find user"
+            );
+        }
+    }
+
     context.subscriptions.push(
         vscode.commands.registerCommand("furui.getProfile", async() => {
             let resultbackendPro;
@@ -166,36 +200,7 @@ export function activate(context: vscode.ExtensionContext) {
                     value: "",
                 })
                 .then(async (value) => {
-                    let token = context.globalState.get("token");
-                    resultbackendPro = await axios({
-                        method: "get",
-                        url: `http://localhost:3000/profile/${value}`,
-                        headers: {
-                            accept: "application/json",
-                            Authorization: `token ${token}`,
-                        },
-                    });
-                    console.log(resultbackendPro.data)
-                    if (resultbackendPro.data.success){
-                        let profilePanel = vscode.window.createWebviewPanel(
-                            "Furui",
-                            "Furui",
-                            vscode.ViewColumn.One,
-                            {
-                                enableScripts: true,
-                            }
-                        );
-                        console.log("here")
-                        profilePanel.webview.html = getWebviewContentProfile(resultbackendPro);
-                        vscode.window.showInformationMessage(
-                            "Successfully retrieved user from database"
-                        );
-                    }
-                    else{
-                        vscode.window.showInformationMessage(
-                            "Could not find user"
-                        );
-                    }
+                    showProfile(value);
                 });
         })
     )

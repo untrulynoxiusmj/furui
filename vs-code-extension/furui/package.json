@@ -49,7 +49,37 @@
 				"command": "furui.getProfile",
 				"title": "furui: See Profile"
 			}
-		]
+		],
+		"keybindings": [
+            {
+                "command": "furui.login",
+                "key": "ctrl+p l"
+            },
+            {
+                "command": "furui.addCode",
+                "key": "ctrl+p a"
+			},
+			{
+                "command": "furui.getCode",
+                "key": "ctrl+p f"
+			},
+			{
+                "command": "furui.next",
+                "key": "ctrl+p right"
+			},
+			{
+                "command": "furui.prev",
+                "key": "ctrl+p left"
+			},
+			{
+                "command": "furui.setTags",
+                "key": "ctrl+p t"
+			},
+			{
+                "command": "furui.getProfile",
+                "key": "ctrl+p o"
+            }
+        ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

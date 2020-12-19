@@ -1,27 +1,53 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import axios from 'axios';
+const express = require('express');
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "furui" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('furui.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+	context.subscriptions.push(vscode.commands.registerCommand('furui.login', () => {
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from furui!');
-	});
+		const app = express();
 
-	context.subscriptions.push(disposable);
+		app.get('/getToken', async (req:any, res:any) => {
+
+			try {
+				let token = req.query.access_token;
+
+				const resultbackend = await axios({
+					method: 'get',
+					url: `http://localhost:3000/user`,
+					headers: {
+					  accept: 'application/json',
+					  Authorization: `token ${token}`
+					}
+				  });
+
+				  
+				context.globalState.update("token", token);
+				vscode.window.showInformationMessage('Successfully Logged In: ' + resultbackend.data.login);
+				console.log(resultbackend.data);
+				res.send("Logged In")
+				console.log("Server closed")
+				server.close();
+
+			} catch (error) {
+				console.log(error);
+			}
+		})
+
+		var server = app.listen(5000,()=>{
+			console.log("Server listening on port : 5000")
+		})
+
+
+		vscode.commands.executeCommand(
+			"vscode.open",
+			vscode.Uri.parse(`http://localhost:3000/auth/github`)
+		);
+	}))
+
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}

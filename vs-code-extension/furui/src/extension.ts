@@ -183,6 +183,21 @@ export function activate(context: vscode.ExtensionContext) {
             );
         })
     );
+
+    context.subscriptions.push(vscode.commands.registerCommand('furui.next', async () => {
+		let page:any = context.globalState.get("page")
+		context.globalState.update("page", page+1);
+		vscode.commands.executeCommand('furui.getCode');
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('furui.prev', async () => {
+		let page:any = context.globalState.get("page")
+		if (page>0){
+			context.globalState.update("page", page-1);
+		}
+		vscode.commands.executeCommand('furui.getCode');
+	}));
+
 }
 
 export function deactivate() {}

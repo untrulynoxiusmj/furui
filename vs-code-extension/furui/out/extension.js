@@ -153,6 +153,18 @@ function activate(context) {
             currentPanel = undefined;
         }, null, context.subscriptions);
     })));
+    context.subscriptions.push(vscode.commands.registerCommand('furui.next', () => __awaiter(this, void 0, void 0, function* () {
+        let page = context.globalState.get("page");
+        context.globalState.update("page", page + 1);
+        vscode.commands.executeCommand('furui.getCode');
+    })));
+    context.subscriptions.push(vscode.commands.registerCommand('furui.prev', () => __awaiter(this, void 0, void 0, function* () {
+        let page = context.globalState.get("page");
+        if (page > 0) {
+            context.globalState.update("page", page - 1);
+        }
+        vscode.commands.executeCommand('furui.getCode');
+    })));
 }
 exports.activate = activate;
 function deactivate() { }

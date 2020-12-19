@@ -166,6 +166,8 @@ app.get("/code/:page", async (req, res) => {
         let page = parseInt(req.params.page);
         let tags = req.query.tags;
 
+        console.log(page)
+
         let quer;
 
         if (tags == "" || tags == undefined) {

@@ -33,7 +33,6 @@ mongo.connect(
     }
 );
 
-
 app.get("/auth/github", (req, res) => {
     res.redirect(
         `https://github.com/login/oauth/authorize?client_id=${clientId}`
@@ -51,11 +50,11 @@ app.get("/auth/github/callback", (req, res) => {
     const opts = { headers: { accept: "application/json" } };
 
     axios
-        
+
         .post(`https://github.com/login/oauth/access_token`, body, opts)
-        
+
         .then((res) => res.data["access_token"])
-        
+
         .then((_token) => {
             token = _token;
             console.log("My token:", token);
@@ -63,7 +62,7 @@ app.get("/auth/github/callback", (req, res) => {
                 `http://localhost:5000/getToken?access_token=${token}`
             );
         })
-        
+
         .catch((err) => res.status(500).json({ message: err.message }));
 });
 
@@ -88,16 +87,14 @@ var userCheck = async function (req, res, next) {
 app.use(userCheck);
 
 app.get("/user", async (req, res) => {
-
     let userData;
 
     try {
         userData = req.user;
-        console.log(userData)
+        console.log(userData);
         const name = userData.name;
         const users = db.collection("users");
 
-        
         let update = await users
             .updateOne(
                 { username: userData.login },
@@ -105,29 +102,22 @@ app.get("/user", async (req, res) => {
                 {
                     upsert: true,
                 }
-                
             )
-            .then((cbValue) => {
-                ;
-            })
+            .then((cbValue) => {})
             .catch((err) => console.error(`Failed to update: ${err}`));
 
-            userData.success = true;
-
+        userData.success = true;
     } catch (error) {
         userData = {
-            success : false
-        }
+            success: false,
+        };
     }
 
     res.send(userData);
 });
 
-
 app.post("/code", async (req, res) => {
-
     try {
-
         let userData = req.user;
 
         let code = req.body.code;
@@ -137,12 +127,11 @@ app.post("/code", async (req, res) => {
         const codes = db.collection("codes");
 
         var newcode;
-        if (code){
+        if (code) {
             newcode = code.replace(/[\u00A0-\u9999<>\&]/gim, function (i) {
                 return "&#" + i.charCodeAt(0) + ";";
             });
-        }
-        else{
+        } else {
             newcode = "";
         }
 
@@ -150,25 +139,20 @@ app.post("/code", async (req, res) => {
         withnl += newcode;
 
         let update = await codes
-            .insertOne(
-                {
-                    username: userData.login,
-                    image : userData.avatar_url,
-                    code: withnl,
-                    title: title,
-                    tags: tags,
-                    likes: 0,
-                }
-            )
-            .then((returnValue) => {
-                ;
+            .insertOne({
+                username: userData.login,
+                image: userData.avatar_url,
+                code: withnl,
+                title: title,
+                tags: tags,
+                likes: 0,
             })
+            .then((returnValue) => {})
             .catch((err) => console.error(`Failed to insert: ${err}`));
 
-            res.send({
-                success: "true",
-            });
-
+        res.send({
+            success: "true",
+        });
     } catch (error) {
         console.log("pumpkin");
         res.send({
@@ -177,6 +161,65 @@ app.post("/code", async (req, res) => {
     }
 });
 
+app.get("/code/:page", async (req, res) => {
+    try {
+        let page = parseInt(req.params.page);
+        let tags = req.query.tags;
+
+        let quer;
+
+        if (tags == "" || tags == undefined) {
+            quer = {};
+        } else {
+            let tagsSplit = tags.toString().split(" ");
+            if (tagsSplit.length == 0) {
+                quer = {};
+            } else {
+                quer = {
+                    tags: { $all: tagsSplit },
+                };
+            }
+        }
+
+        let postCode = new Array();
+        console.log("code get");
+
+        let userData = req.user;
+
+        const codes = db.collection("codes");
+        const likes = db.collection("likes");
+
+        if (page < 1) {
+            page = 1;
+        }
+        let dnif = codes
+            .find(quer)
+            .sort({ _id: -1 })
+            .limit(1)
+            .skip(page - 1);
+        dnif.forEach(async (cur) => {
+            let liked = await likes
+                .findOne({
+                    username: userData.login,
+                    codeId: cur._id.toString(),
+                })
+                .then((item) => {
+                    if (item != null) {
+                        cur.liked = true;
+                    } else {
+                        cur.liked = false;
+                    }
+                });
+            cur.success = true;
+            res.send(cur);
+            return;
+        });
+    } catch (error) {
+        res.send({
+            success : false
+        })
+    }
+});
 
 app.listen(3000);
 console.log("App listening on port 3000");

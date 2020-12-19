@@ -167,7 +167,7 @@ app.get("/code/:page", async (req, res) => {
         let page = parseInt(req.params.page);
         let tags = req.query.tags;
 
-        console.log(page)
+        console.log(page);
 
         let quer;
 
@@ -219,68 +219,95 @@ app.get("/code/:page", async (req, res) => {
         });
     } catch (error) {
         res.send({
-            success : false
-        })
+            success: false,
+        });
     }
 });
 
 app.post("/like", async (req, res) => {
-
     console.log("code like");
     let codeID = req.query.id;
 
     let userData = req.user;
 
     const codes = db.collection("codes");
-      let likes = db.collection("likes");
+    let likes = db.collection("likes");
 
-      let match = {
-        codeId : codeID,
-        username : userData.login
-      }
-      let updateLike = await likes.updateOne(
-        match
-        ,
-        {$set : match},
-        {
-          upsert: true
-        }
-      ).then(async returnValue => {
-          if (returnValue.upsertedCount==1){
-            let update = await codes.updateOne(
-              {
-                _id : new ObjectID(codeID)
-              },
-              {$inc: {likes : 1}},
-            ).then(returnValue => {
-              }
-            )
-            .catch(err => console.error(`Failed to insert: ${err}`))
-          } else{
-            let deleteC = await likes.deleteOne(
-              match
-            ).then(returnValue => {
-              }
-            )
-            .catch(err => console.error(`Failed to insert: ${err}`))
-  
-            let update = await codes.updateOne(
-              {
-                _id : new ObjectID(codeID)
-              },
-              {$inc: {likes : -1}},
-            ).then(returnValue => {
-              }
-            )
-            .catch(err => console.error(`Failed to insert: ${err}`))
-          }
-        }
-      )
-      .catch(err => console.error(`Failed to insert: ${err}`))
+    let match = {
+        codeId: codeID,
+        username: userData.login,
+    };
+    let updateLike = await likes
+        .updateOne(
+            match,
+            { $set: match },
+            {
+                upsert: true,
+            }
+        )
+        .then(async (returnValue) => {
+            if (returnValue.upsertedCount == 1) {
+                let update = await codes
+                    .updateOne(
+                        {
+                            _id: new ObjectID(codeID),
+                        },
+                        { $inc: { likes: 1 } }
+                    )
+                    .then((returnValue) => {})
+                    .catch((err) => console.error(`Failed to insert: ${err}`));
+            } else {
+                let deleteC = await likes
+                    .deleteOne(match)
+                    .then((returnValue) => {})
+                    .catch((err) => console.error(`Failed to insert: ${err}`));
 
-      res.send({msg: "ok"});
-})
+                let update = await codes
+                    .updateOne(
+                        {
+                            _id: new ObjectID(codeID),
+                        },
+                        { $inc: { likes: -1 } }
+                    )
+                    .then((returnValue) => {})
+                    .catch((err) => console.error(`Failed to insert: ${err}`));
+            }
+        })
+        .catch((err) => console.error(`Failed to insert: ${err}`));
 
+    res.send({ msg: "ok" });
+});
+
+app.post("/comment", async (req, res) => {
+    
+    let userData = req.user;
+
+    let id = req.body.id;
+    let text = req.body.text;
+    const codes = db.collection("codes");
+
+    let update = await codes
+        .updateOne(
+            {
+                _id: new ObjectID(id),
+            },
+            {
+                $push: {
+                    comments: {
+                        username: userData.login,
+                        comment: text,
+                    },
+                },
+            }
+        )
+        .then((returnValue) => {
+        })
+        .catch((err) => console.error(`Failed to insert: ${err}`));
+
+    res.send({
+        msg: "ok",
+    });
+});
 
 app.listen(3000);
 console.log("App listening on port 3000");

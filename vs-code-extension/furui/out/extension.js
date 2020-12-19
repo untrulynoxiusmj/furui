@@ -360,7 +360,7 @@ function getWebviewContent(resultbackend) {
         
 		</head>
 	
-		<body>
+        <body>
     
             <div class=all>
                 <div class=one>
@@ -391,7 +391,9 @@ function getWebviewContent(resultbackend) {
                     </div>
                 </div>
             </div>
-        
+            
+            <center><span class=four>Tags : ${JSON.stringify(element.tags)}</span></center>
+
             <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
 	        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	        <script>

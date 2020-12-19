@@ -6,7 +6,6 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "furui" is now active!');
     context.globalState.update("page", 1);
     let currentPanel: vscode.WebviewPanel | undefined = undefined;
-
     context.subscriptions.push(
         vscode.commands.registerCommand("furui.login", () => {
             const app = express();
@@ -423,7 +422,7 @@ function getWebviewContent(resultbackend: any) {
         
 		</head>
 	
-		<body>
+        <body>
     
             <div class=all>
                 <div class=one>
@@ -454,7 +453,9 @@ function getWebviewContent(resultbackend: any) {
                     </div>
                 </div>
             </div>
-        
+            
+            <center><span class=four>Tags : ${JSON.stringify(element.tags)}</span></center>
+
             <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
 	        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	        <script>

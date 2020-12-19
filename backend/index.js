@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const mongo = require("mongodb").MongoClient;
+const ObjectID = require("mongodb").ObjectID;
 const cors = require("cors");
 var bodyParser = require("body-parser");
 
@@ -222,6 +223,64 @@ app.get("/code/:page", async (req, res) => {
         })
     }
 });
+
+app.post("/like", async (req, res) => {
+
+    console.log("code like");
+    let codeID = req.query.id;
+
+    let userData = req.user;
+
+    const codes = db.collection("codes");
+      let likes = db.collection("likes");
+
+      let match = {
+        codeId : codeID,
+        username : userData.login
+      }
+      let updateLike = await likes.updateOne(
+        match
+        ,
+        {$set : match},
+        {
+          upsert: true
+        }
+      ).then(async returnValue => {
+          if (returnValue.upsertedCount==1){
+            let update = await codes.updateOne(
+              {
+                _id : new ObjectID(codeID)
+              },
+              {$inc: {likes : 1}},
+            ).then(returnValue => {
+              }
+            )
+            .catch(err => console.error(`Failed to insert: ${err}`))
+          } else{
+            let deleteC = await likes.deleteOne(
+              match
+            ).then(returnValue => {
+              }
+            )
+            .catch(err => console.error(`Failed to insert: ${err}`))
+  
+            let update = await codes.updateOne(
+              {
+                _id : new ObjectID(codeID)
+              },
+              {$inc: {likes : -1}},
+            ).then(returnValue => {
+              }
+            )
+            .catch(err => console.error(`Failed to insert: ${err}`))
+          }
+        }
+      )
+      .catch(err => console.error(`Failed to insert: ${err}`))
+
+      res.send({msg: "ok"});
+})
+
 
 app.listen(3000);
 console.log("App listening on port 3000");

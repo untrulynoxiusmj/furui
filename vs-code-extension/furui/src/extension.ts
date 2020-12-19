@@ -5,13 +5,14 @@ const express = require("express");
 export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "furui" is now active!');
 
+    let currentPanel: vscode.WebviewPanel | undefined = undefined;
+
     context.subscriptions.push(
         vscode.commands.registerCommand("furui.login", () => {
             const app = express();
 
             app.get("/getToken", async (req: any, res: any) => {
                 try {
-
                     let token = req.query.access_token;
 
                     const resultbackend = await axios({
@@ -23,28 +24,25 @@ export function activate(context: vscode.ExtensionContext) {
                         },
                     });
 
-					if (resultbackend.data.success){
-						context.globalState.update("token", token);
-						vscode.window.showInformationMessage(
-							"Successfully Logged In: " + resultbackend.data.login
-						);
-						console.log(resultbackend.data);
-						res.send("Logged In");
-					}
-					else{
-						vscode.window.showInformationMessage(
-							"Login Failed"
-						);
-						res.send("Login Failed");
-					}
-					
+                    if (resultbackend.data.success) {
+                        context.globalState.update("token", token);
+                        vscode.window.showInformationMessage(
+                            "Successfully Logged In: " +
+                                resultbackend.data.login
+                        );
+                        console.log(resultbackend.data);
+                        res.send("Logged In");
+                    } else {
+                        vscode.window.showInformationMessage("Login Failed");
+                        res.send("Login Failed");
+                    }
                 } catch (error) {
-					res.send(error);
+                    res.send(error);
                     console.log(error);
-				}
-				
-				console.log("Server closed");
-				server.close();
+                }
+
+                console.log("Server closed");
+                server.close();
             });
 
             var server = app.listen(5000, () => {
@@ -72,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
                         text = originalText;
                     }
                 }
-			}
+            }
 
             vscode.window
                 .showInputBox({
@@ -111,19 +109,17 @@ export function activate(context: vscode.ExtensionContext) {
                                             Authorization: `token ${token}`,
                                         },
                                     }
-								);
-								
-								if (result.data.success){
-									vscode.window.showInformationMessage(
-										"Successfully added code to database"
-									);
-								}
-								else {
-									vscode.window.showInformationMessage(
-										"Error : Code could not added"
-									);
-								}
-								
+                                );
+
+                                if (result.data.success) {
+                                    vscode.window.showInformationMessage(
+                                        "Successfully added code to database"
+                                    );
+                                } else {
+                                    vscode.window.showInformationMessage(
+                                        "Error : Code could not added"
+                                    );
+                                }
                             } catch (error) {
                                 console.log(error);
                             }
@@ -131,6 +127,66 @@ export function activate(context: vscode.ExtensionContext) {
                 });
         })
     );
+
+    let show = async (currentPanel: vscode.WebviewPanel) => {
+        let result;
+        let page: any = context.globalState.get("page");
+        let token = context.globalState.get("token");
+        let tags = context.globalState.get("tags");
+        let params = {
+            tags: tags,
+        };
+        const resultbackend = await axios({
+            method: "get",
+            url: `http://localhost:3000/code/${page}`,
+            params,
+            headers: {
+                accept: "application/json",
+                Authorization: `token ${token}`,
+            },
+        });
+
+        vscode.window.showInformationMessage(
+            "Successfully retrieved codes from database"
+        );
+        console.log(resultbackend.data);
+
+        currentPanel.webview.html = getWebviewContent(resultbackend);
+    };
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand("furui.getCode", async () => {
+            if (currentPanel != undefined) {
+                currentPanel.reveal();
+                show(currentPanel);
+                return;
+            } else {
+                currentPanel = vscode.window.createWebviewPanel(
+                    "Furui",
+                    "Furui",
+                    vscode.ViewColumn.One,
+                    {
+                        enableScripts: true,
+                    }
+                );
+            }
+
+            show(currentPanel);
+
+            currentPanel.onDidDispose(
+                () => {
+                    vscode.window.showInformationMessage("Web View Disposed");
+                    currentPanel = undefined;
+                },
+                null,
+                context.subscriptions
+            );
+        })
+    );
 }
 
 export function deactivate() {}
+
+function getWebviewContent(resultbackend: any) {
+    return `<html>${resultbackend.data.code}</html>`;
+}

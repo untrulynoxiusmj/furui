@@ -15,6 +15,7 @@ const axios_1 = require("axios");
 const express = require("express");
 function activate(context) {
     console.log('Congratulations, your extension "furui" is now active!');
+    let currentPanel = undefined;
     context.subscriptions.push(vscode.commands.registerCommand("furui.login", () => {
         const app = express();
         app.get("/getToken", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -30,7 +31,8 @@ function activate(context) {
                 });
                 if (resultbackend.data.success) {
                     context.globalState.update("token", token);
-                    vscode.window.showInformationMessage("Successfully Logged In: " + resultbackend.data.login);
+                    vscode.window.showInformationMessage("Successfully Logged In: " +
+                        resultbackend.data.login);
                     console.log(resultbackend.data);
                     res.send("Logged In");
                 }
@@ -113,8 +115,49 @@ function activate(context) {
             }));
         }));
     })));
+    let show = (currentPanel) => __awaiter(this, void 0, void 0, function* () {
+        let result;
+        let page = context.globalState.get("page");
+        let token = context.globalState.get("token");
+        let tags = context.globalState.get("tags");
+        let params = {
+            tags: tags,
+        };
+        const resultbackend = yield axios_1.default({
+            method: "get",
+            url: `http://localhost:3000/code/${page}`,
+            params,
+            headers: {
+                accept: "application/json",
+                Authorization: `token ${token}`,
+            },
+        });
+        vscode.window.showInformationMessage("Successfully retrieved codes from database");
+        console.log(resultbackend.data);
+        currentPanel.webview.html = getWebviewContent(resultbackend);
+    });
+    context.subscriptions.push(vscode.commands.registerCommand("furui.getCode", () => __awaiter(this, void 0, void 0, function* () {
+        if (currentPanel != undefined) {
+            currentPanel.reveal();
+            show(currentPanel);
+            return;
+        }
+        else {
+            currentPanel = vscode.window.createWebviewPanel("Furui", "Furui", vscode.ViewColumn.One, {
+                enableScripts: true,
+            });
+        }
+        show(currentPanel);
+        currentPanel.onDidDispose(() => {
+            vscode.window.showInformationMessage("Web View Disposed");
+            currentPanel = undefined;
+        }, null, context.subscriptions);
+    })));
 }
 exports.activate = activate;
 function deactivate() { }
 exports.deactivate = deactivate;
+function getWebviewContent(resultbackend) {
+    return `<html>${resultbackend.data.code}</html>`;
+}
 //# sourceMappingURL=extension.js.map

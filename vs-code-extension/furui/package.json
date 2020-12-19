@@ -11,7 +11,8 @@
 	],
 	"activationEvents": [
 		"onCommand:furui.login",
-		"onCommand:furui.addCode"
+		"onCommand:furui.addCode",
+		"onCommand:furui.getCode"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -23,6 +24,10 @@
 			{
 				"command": "furui.addCode",
 				"title": "furui: Add new Code"
+			},
+			{
+				"command": "furui.getCode",
+				"title": "furui: Feed"
 			}
 		]
 	},

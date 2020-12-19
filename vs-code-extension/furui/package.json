@@ -14,7 +14,8 @@
 		"onCommand:furui.addCode",
 		"onCommand:furui.getCode",
 		"onCommand:furui.next",
-		"onCommand:furui.prev"
+		"onCommand:furui.prev",
+		"onCommand:furui.setTags"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -38,6 +39,10 @@
 			{
 				"command": "furui.prev",
 				"title": "furui: Feed Prev"
+			},
+			{
+				"command": "furui.setTags",
+				"title": "furui: Set tags"
 			}
 		]
 	},

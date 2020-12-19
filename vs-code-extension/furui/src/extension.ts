@@ -240,6 +240,19 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('furui.setTags', ()=>{
+            vscode.window.showInputBox({
+                placeHolder: 'Enter tags',
+                prompt: 'Enter tags',
+                value: ''
+              }).then(tgs => {
+                context.globalState.update("tags", tgs);
+                context.globalState.update("page", 1);
+              })
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand("furui.next", async () => {
             let page: any = context.globalState.get("page");
             context.globalState.update("page", page + 1);

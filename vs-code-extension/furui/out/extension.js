@@ -200,6 +200,16 @@ function activate(context) {
             currentPanel = undefined;
         }, null, context.subscriptions);
     })));
+    context.subscriptions.push(vscode.commands.registerCommand('furui.setTags', () => {
+        vscode.window.showInputBox({
+            placeHolder: 'Enter tags',
+            prompt: 'Enter tags',
+            value: ''
+        }).then(tgs => {
+            context.globalState.update("tags", tgs);
+            context.globalState.update("page", 1);
+        });
+    }));
     context.subscriptions.push(vscode.commands.registerCommand("furui.next", () => __awaiter(this, void 0, void 0, function* () {
         let page = context.globalState.get("page");
         context.globalState.update("page", page + 1);

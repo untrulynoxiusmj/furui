@@ -123,5 +123,60 @@ app.get("/user", async (req, res) => {
     res.send(userData);
 });
 
+
+app.post("/code", async (req, res) => {
+
+    try {
+
+        let userData = req.user;
+
+        let code = req.body.code;
+        let title = req.body.title;
+        let tags = req.body.tags;
+
+        const codes = db.collection("codes");
+
+        var newcode;
+        if (code){
+            newcode = code.replace(/[\u00A0-\u9999<>\&]/gim, function (i) {
+                return "&#" + i.charCodeAt(0) + ";";
+            });
+        }
+        else{
+            newcode = "";
+        }
+
+        var withnl = "\n";
+        withnl += newcode;
+
+        let update = await codes
+            .insertOne(
+                {
+                    username: userData.login,
+                    image : userData.avatar_url,
+                    code: withnl,
+                    title: title,
+                    tags: tags,
+                    likes: 0,
+                }
+            )
+            .then((returnValue) => {
+                ;
+            })
+            .catch((err) => console.error(`Failed to insert: ${err}`));
+
+            res.send({
+                success: "true",
+            });
+
+    } catch (error) {
+        console.log("pumpkin");
+        res.send({
+            success: "false",
+        });
+    }
+});
+
+
 app.listen(3000);
 console.log("App listening on port 3000");

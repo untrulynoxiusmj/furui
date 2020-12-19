@@ -1,53 +1,136 @@
-import * as vscode from 'vscode';
-import axios from 'axios';
-const express = require('express');
+import * as vscode from "vscode";
+import axios from "axios";
+const express = require("express");
 
 export function activate(context: vscode.ExtensionContext) {
+    console.log('Congratulations, your extension "furui" is now active!');
 
-	console.log('Congratulations, your extension "furui" is now active!');
+    context.subscriptions.push(
+        vscode.commands.registerCommand("furui.login", () => {
+            const app = express();
 
-	context.subscriptions.push(vscode.commands.registerCommand('furui.login', () => {
+            app.get("/getToken", async (req: any, res: any) => {
+                try {
 
-		const app = express();
+                    let token = req.query.access_token;
 
-		app.get('/getToken', async (req:any, res:any) => {
+                    const resultbackend = await axios({
+                        method: "get",
+                        url: `http://localhost:3000/user`,
+                        headers: {
+                            accept: "application/json",
+                            Authorization: `token ${token}`,
+                        },
+                    });
 
-			try {
-				let token = req.query.access_token;
-
-				const resultbackend = await axios({
-					method: 'get',
-					url: `http://localhost:3000/user`,
-					headers: {
-					  accept: 'application/json',
-					  Authorization: `token ${token}`
+					if (resultbackend.data.success){
+						context.globalState.update("token", token);
+						vscode.window.showInformationMessage(
+							"Successfully Logged In: " + resultbackend.data.login
+						);
+						console.log(resultbackend.data);
+						res.send("Logged In");
 					}
-				  });
-
-				  
-				context.globalState.update("token", token);
-				vscode.window.showInformationMessage('Successfully Logged In: ' + resultbackend.data.login);
-				console.log(resultbackend.data);
-				res.send("Logged In")
-				console.log("Server closed")
+					else{
+						vscode.window.showInformationMessage(
+							"Login Failed"
+						);
+						res.send("Login Failed");
+					}
+					
+                } catch (error) {
+					res.send(error);
+                    console.log(error);
+				}
+				
+				console.log("Server closed");
 				server.close();
+            });
 
-			} catch (error) {
-				console.log(error);
+            var server = app.listen(5000, () => {
+                console.log("Server listening on port : 5000");
+            });
+
+            vscode.commands.executeCommand(
+                "vscode.open",
+                vscode.Uri.parse(`http://localhost:3000/auth/github`)
+            );
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand("furui.addCode", async () => {
+            let text: string;
+            const window = vscode.window;
+            const editor = window.activeTextEditor;
+            if (editor) {
+                const selection = editor.selection;
+                if (selection) {
+                    const originalText = editor.document.getText(selection);
+                    if (originalText.length > 0) {
+                        console.log(originalText);
+                        text = originalText;
+                    }
+                }
 			}
-		})
 
-		var server = app.listen(5000,()=>{
-			console.log("Server listening on port : 5000")
-		})
-
-
-		vscode.commands.executeCommand(
-			"vscode.open",
-			vscode.Uri.parse(`http://localhost:3000/auth/github`)
-		);
-	}))
-
+            vscode.window
+                .showInputBox({
+                    placeHolder: "Title for code",
+                    prompt: "Type a title for code",
+                    value: "",
+                })
+                .then(async (value) => {
+                    vscode.window
+                        .showInputBox({
+                            placeHolder: "Enter tags",
+                            prompt: "Enter tags",
+                            value: "",
+                        })
+                        .then(async (valueTag) => {
+                            console.log(value);
+                            let arrTag;
+                            if (valueTag) {
+                                arrTag = valueTag.split(" ");
+                            } else {
+                                arrTag = new Array();
+                            }
+                            let data = {
+                                title: value,
+                                code: text,
+                                tags: arrTag,
+                            };
+                            try {
+                                let token = context.globalState.get("token");
+                                let result = await axios.post(
+                                    `http://localhost:3000/code`,
+                                    data,
+                                    {
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: `token ${token}`,
+                                        },
+                                    }
+								);
+								
+								if (result.data.success){
+									vscode.window.showInformationMessage(
+										"Successfully added code to database"
+									);
+								}
+								else {
+									vscode.window.showInformationMessage(
+										"Error : Code could not added"
+									);
+								}
+								
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        });
+                });
+        })
+    );
 }
 
 export function deactivate() {}

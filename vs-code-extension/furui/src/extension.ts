@@ -174,8 +174,62 @@ export function activate(context: vscode.ExtensionContext) {
 
             show(currentPanel);
 
+            currentPanel.webview.onDidReceiveMessage(
+                async message => {
+                  switch (message.command) {
+                    case 'like': {
+                        let token = context.globalState.get("token");
+                        const resultN = await axios({
+                            method: "post",
+                            url: "http://localhost:3000/like/?id="+message.text,
+                            headers: {
+                              accept: "application/json",
+                              Authorization: `token ${token}`,
+                            },
+                          })
+                          if (currentPanel != undefined){
+                            show(currentPanel);
+                          }
+                          else{
+                            vscode.commands.executeCommand('scully.getCode');
+                          }
+                            vscode.window.showInformationMessage("Successfully liked the post");
+                            break;
+                        }
+                    
+                    case 'comment': {
+                        let token = context.globalState.get("token");
+                        let data = {
+                            id : message.id,
+                            text : message.text
+                        }
+                        const resultNc = await axios.post(
+                            `http://localhost:3000/comment`,
+                            data,
+                            {
+                                headers: {
+                                    'content-type': 'application/json',
+                                    Authorization: `token ${token}`
+                                  }
+                            }
+                          );
+                          if (currentPanel != undefined) show(currentPanel)
+                          else{
+                            vscode.commands.executeCommand('scully.getCode');
+                          }
+                            vscode.window.showInformationMessage("Succesfully posted the comment");
+                            break;
+                        }
+                            
+                  }
+                },
+                undefined,
+                context.subscriptions
+              );
+
             currentPanel.onDidDispose(
                 () => {
+                    context.globalState.update("page", 1);
                     vscode.window.showInformationMessage("Web View Disposed");
                     currentPanel = undefined;
                 },
@@ -209,6 +263,13 @@ export function deactivate() {}
 function getWebviewContent(resultbackend: any) {
 
     let element = resultbackend.data;
+    let cA;
+    if (element.comments!=undefined){
+        cA = JSON.stringify(element.comments.reverse(), undefined, 4);
+    }
+    else {
+        cA = "No Comments";
+    }
 
     let allCodes = `
     
@@ -310,9 +371,7 @@ function getWebviewContent(resultbackend: any) {
                         <span>${element.title}</span>
                     </div>
                     <pre>
-                        <code>
-                            ${element.code}
-                        </code>
+                        <code>${element.code}</code>
                     </pre>
                 
                     <div class=inc>
@@ -324,9 +383,7 @@ function getWebviewContent(resultbackend: any) {
                 <div class="commentBox">
                     <span class=four>Comments</span>
                     <pre>
-                        <code>
-                            ${JSON.stringify(element.comments, undefined, 4)}
-                        </code>
+                        <code>${cA}</code>
                     </pre>
                     <div class="textarea-container">
                         <textarea name="Write your Comment" id="ta" placeholder="Write your Comment"></textarea>
@@ -342,9 +399,20 @@ function getWebviewContent(resultbackend: any) {
                 hljs.initHighlightingOnLoad();
                 const vscode = acquireVsCodeApi();
                 console.log("hello");
+                
                 function like(id){
+                    vscode.postMessage({
+                        command: 'like',
+                        text: id
+                    })
                 }
                 function comment(id){
+                    let tx = document.getElementById("ta").value;
+                    vscode.postMessage({
+                        command: 'comment',
+                        text: tx,
+                        id : id
+                    })
                 }
 
             </script>
@@ -358,6 +426,8 @@ function getWebviewContent(resultbackend: any) {
 	    </script>
 
     </html>`;
+
+    console.log(allCodes);
 
     return allCodes;
 }

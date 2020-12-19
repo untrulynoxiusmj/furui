@@ -279,7 +279,7 @@ app.post("/like", async (req, res) => {
 });
 
 app.post("/comment", async (req, res) => {
-    
+
     let userData = req.user;
 
     let id = req.body.id;

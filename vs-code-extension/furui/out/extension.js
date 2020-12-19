@@ -139,6 +139,38 @@ function activate(context) {
         console.log(resultbackend.data);
         currentPanel.webview.html = getWebviewContent(resultbackend);
     });
+    context.subscriptions.push(vscode.commands.registerCommand("furui.getProfile", () => __awaiter(this, void 0, void 0, function* () {
+        let resultbackendPro;
+        vscode.window
+            .showInputBox({
+            placeHolder: "Username",
+            prompt: "Type username",
+            value: "",
+        })
+            .then((value) => __awaiter(this, void 0, void 0, function* () {
+            let token = context.globalState.get("token");
+            resultbackendPro = yield axios_1.default({
+                method: "get",
+                url: `http://localhost:3000/profile/${value}`,
+                headers: {
+                    accept: "application/json",
+                    Authorization: `token ${token}`,
+                },
+            });
+            console.log(resultbackendPro.data);
+            if (resultbackendPro.data.success) {
+                let profilePanel = vscode.window.createWebviewPanel("Furui", "Furui", vscode.ViewColumn.One, {
+                    enableScripts: true,
+                });
+                console.log("here");
+                profilePanel.webview.html = getWebviewContentProfile(resultbackendPro);
+                vscode.window.showInformationMessage("Successfully retrieved user from database");
+            }
+            else {
+                vscode.window.showInformationMessage("Could not find user");
+            }
+        }));
+    })));
     context.subscriptions.push(vscode.commands.registerCommand("furui.getCode", () => __awaiter(this, void 0, void 0, function* () {
         if (currentPanel != undefined) {
             currentPanel.reveal();
@@ -392,5 +424,39 @@ function getWebviewContent(resultbackend) {
     </html>`;
     console.log(allCodes);
     return allCodes;
+}
+function getWebviewContentProfile(resultbackend) {
+    let element = resultbackend.data;
+    let htmlCon = `
+    
+    <html>
+        <head>
+            <style>
+                img {
+                    border-radius: 50%;
+                    width : 25vh;
+                }
+                h1 {
+                    font-size : 6vh;
+                }
+                h2 {
+                    font-size : 4vh;
+                }
+            </style>
+        </head>
+        <body>
+            <center>
+                <h1>${element.username}</h1>
+                <img src=${element.avatar_url}>
+                <h2>${element.name}</h2>
+                <h2>Github : </h2>
+                <h2>Followers : ${element.followers}</h2>
+                <h2>Following : ${element.following}</h2>
+                <h2>Public repos : ${element.public_repos}</h2>
+            </center>
+        </body>
+    </html>
+    `;
+    return htmlCon;
 }
 //# sourceMappingURL=extension.js.map

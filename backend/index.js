@@ -162,6 +162,33 @@ app.post("/code", async (req, res) => {
     }
 });
 
+app.get("/profile/:username", async (req, res) => {
+    try {
+        let username = req.params.username;
+        const users = db.collection('users');
+        let result = users.findOne({
+            username: username
+        })
+        .then(cb => {
+            if (cb!=null){
+                cb.success = true;
+                res.send(cb);
+                return;
+            }
+            else{
+                res.send({
+                    success : false
+                })
+            }
+            
+        })
+    } catch (error) {
+        res.send({
+            success : false
+        })
+    }
+})
+
 app.get("/code/:page", async (req, res) => {
     try {
         let page = parseInt(req.params.page);

@@ -2,6 +2,13 @@
 
 ## vs code extension
 
+	An isolated community on vscode
+	Add your own codes
+	See codes written by others
+	Review other users' code
+	Get Review on your codes
+	Help others
+
 # How to run :
 ## backend:
 	Open /backend/ in terminal
@@ -45,7 +52,11 @@ https://code.visualstudio.com/api/get-started/your-first-extension
 	Then you have to give Title ans set tags for the post
 
 	Command: Feed shows posts according to tags set using 
-	command: Set Tags
+	command: Set Tags 
+	Example:
+		Users can add posts with tag 'help' and others can
+		easily help them by getting posts having tag 'help'
+		OR they can also specify language (js, cpp) in tags. etc.
 
 	Feed Next and Feed Prev can be used to navigate feed
 
@@ -53,5 +64,6 @@ https://code.visualstudio.com/api/get-started/your-first-extension
 	username
 
 	Increment/decrement and Comments are added by clicking respective
-	areas on page : ++ and -- for increment and decrement
-				    () =>
+	areas on page : 
+	++ and -- for increment and decrement
+	() => for comments

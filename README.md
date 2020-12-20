@@ -60,8 +60,8 @@
 
 	Increment/decrement and Comments are added by clicking respective
 	areas on page :
-  ++ and -- for increment and decrement
-	() =>
+ 	++ and -- for increment and decrement
+	() => for comments
             
 ## VSCode API Documentation :
 https://code.visualstudio.com/api/get-started/your-first-extension

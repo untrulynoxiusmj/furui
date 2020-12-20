@@ -241,7 +241,12 @@ export function activate(context: vscode.ExtensionContext) {
                           else{
                             vscode.commands.executeCommand('scully.getCode');
                           }
-                            vscode.window.showInformationMessage("Successfully liked the post");
+                            if (resultN.data.like){
+                                vscode.window.showInformationMessage("Successfully incremented the post");
+                            }
+                            else{
+                                vscode.window.showInformationMessage("Successfully decremented the post");
+                            }
                             break;
                         }
                     

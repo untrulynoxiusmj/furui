@@ -272,6 +272,7 @@ app.post("/like", async (req, res) => {
         codeId: codeID,
         username: userData.login,
     };
+    let like = true;
     let updateLike = await likes
         .updateOne(
             match,
@@ -292,6 +293,7 @@ app.post("/like", async (req, res) => {
                     .then((returnValue) => {})
                     .catch((err) => console.error(`Failed to insert: ${err}`));
             } else {
+                like = false;
                 let deleteC = await likes
                     .deleteOne(match)
                     .then((returnValue) => {})
@@ -310,7 +312,10 @@ app.post("/like", async (req, res) => {
         })
         .catch((err) => console.error(`Failed to insert: ${err}`));
 
-    res.send({ msg: "ok" });
+    res.send({
+         msg: "ok",
+         like:like
+    });
 });
 
 app.post("/comment", async (req, res) => {
@@ -340,7 +345,7 @@ app.post("/comment", async (req, res) => {
         .catch((err) => console.error(`Failed to insert: ${err}`));
 
     res.send({
-        msg: "ok",
+        msg: "ok"
     });
 });
 

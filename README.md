@@ -1,6 +1,6 @@
 # FURUI 👨‍💻
 ```  
-  An isolated community on vscode
+  An exclusive community for vscode
 	Add your own codes
 	See codes written by others
 	Review other users' code

@@ -24,8 +24,35 @@ A mini VSCode community where users can post their codes and also see the codes 
 	> press ctrl + shift + p , then choose your command
 	> use keybindings (shortcut keys)
 
+## Usage
+	We can run commands from Command Palette or by using shortcut keys
+	Keybindings can be changed as per convinience
+	For this extension commands are:
+		Login with github, (ctrl+p l)
+		Add new Code, (ctrl+p a)
+		Feed, (ctrl+p f)
+		Feed Next, (ctrl+p right)
+		Feed Prev, (ctrl+p left)
+		Set Tags, (ctrl+p t)
+		See Profile (ctrl+p o)
+
+	New code can be added by selecting the code in vscode editor
+	and then by running commmand : Add New Code
+	Then you have to give Title ans set tags for the post
+
+	Command: Feed shows posts according to tags set using 
+	command: Set Tags
+
+	Feed Next and Feed Prev can be used to navigate feed
+
+	See Profile is used to see profile of other users by entering
+	username
+
+	Increment/decrement and Comments are added by clicking respective
+	areas on page : ++ and -- for increment and decrement
+				    () =>
+            
 ## VSCode API Documentation :
 https://code.visualstudio.com/api/get-started/your-first-extension
 
 
-													

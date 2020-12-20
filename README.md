@@ -1,6 +1,12 @@
 # FURUI 👨‍💻
-A mini VSCode community where users can post their codes and also see the codes posted by other users along with their github profiles.
-	
+```  
+  An isolated community on vscode
+	Add your own codes
+	See codes written by others
+	Review other users' code
+	Get Review on your codes
+	Help others
+```
 ## Functionalities 
 	- Login with Github
 	- Add new code posts
@@ -41,7 +47,11 @@ A mini VSCode community where users can post their codes and also see the codes 
 	Then you have to give Title ans set tags for the post
 
 	Command: Feed shows posts according to tags set using 
-	command: Set Tags
+	command: Set Tags 
+	Example:
+		Users can add posts with tag 'help' and others can
+		easily help them by getting posts having tag 'help'
+		OR they can also specify language (js, cpp) in tags. etc.
 
 	Feed Next and Feed Prev can be used to navigate feed
 
@@ -49,8 +59,9 @@ A mini VSCode community where users can post their codes and also see the codes 
 	username
 
 	Increment/decrement and Comments are added by clicking respective
-	areas on page : ++ and -- for increment and decrement
-				    () =>
+	areas on page :
+  ++ and -- for increment and decrement
+	() =>
             
 ## VSCode API Documentation :
 https://code.visualstudio.com/api/get-started/your-first-extension

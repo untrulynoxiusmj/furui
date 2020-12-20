@@ -1,39 +1,34 @@
-# furui
-
-## vs code extension
-
-	An isolated community on vscode
+# FURUI 👨‍💻
+```  
+  An isolated community on vscode
 	Add your own codes
 	See codes written by others
 	Review other users' code
 	Get Review on your codes
 	Help others
+```
+## Functionalities 
+	- Login with Github
+	- Add new code posts
+	- View codes posted by other users (feed)
+	- Increment/decrement [like/dislike]
+	- Add comments
+	- Specify tags while adding a post
+	- Filter feed using tags
 
-# How to run :
-## backend:
+## How to run 🚀
+### _backend:_
 	Open /backend/ in terminal
 	> npm install
 	> node index.js
-## frontend (extension):
+### _frontend (extension):_
 	Open /vs-code-extension/furui in vscode
 	> npm install
 	> Press f5
-#### vscode api documentation :
-https://code.visualstudio.com/api/get-started/your-first-extension
-
-## some-info
-	Extension commsnds can be run using:
+### _Commands:_
+	Extension commands can be run using:
 	> press ctrl + shift + p , then choose your command
 	> use keybindings (shortcut keys)
-													
-## Functionality
-	Login with Github
-	Add new code posts
-	View codes posted by other users (feed)
-	increment/decrement [like/dislike]
-	Comments
-	Specify tags while adding a post
-	Filter feed using tags
 
 ## Usage
 	We can run commands from Command Palette or by using shortcut keys
@@ -64,6 +59,11 @@ https://code.visualstudio.com/api/get-started/your-first-extension
 	username
 
 	Increment/decrement and Comments are added by clicking respective
-	areas on page : 
-	++ and -- for increment and decrement
-	() => for comments
+	areas on page :
+  ++ and -- for increment and decrement
+	() =>
+            
+## VSCode API Documentation :
+https://code.visualstudio.com/api/get-started/your-first-extension
+
+

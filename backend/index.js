@@ -191,6 +191,7 @@ app.get("/profile/:username", async (req, res) => {
 
 app.get("/code/:page", async (req, res) => {
     try {
+
         let page = parseInt(req.params.page);
         let tags = req.query.tags;
 
@@ -219,6 +220,11 @@ app.get("/code/:page", async (req, res) => {
         const codes = db.collection("codes");
         const likes = db.collection("likes");
 
+        let total = 0;
+        codes.countDocuments().then((count) => {
+            total = count;
+        });
+
         if (page < 1) {
             page = 1;
         }
@@ -241,10 +247,12 @@ app.get("/code/:page", async (req, res) => {
                     }
                 });
             cur.success = true;
+            cur.total = total;
             res.send(cur);
             return;
         });
     } catch (error) {
+        console.log("here")
         res.send({
             success: false,
         });

@@ -130,7 +130,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     let show = async (currentPanel: vscode.WebviewPanel) => {
         console.log("show");
-        let result;
         let page: any = context.globalState.get("page");
         let token = context.globalState.get("token");
         let tags = context.globalState.get("tags");
@@ -151,7 +150,7 @@ export function activate(context: vscode.ExtensionContext) {
             "Successfully retrieved codes from database"
         );
         console.log(resultbackend.data);
-
+        context.globalState.update("total", resultbackend.data.total);
         currentPanel.webview.html = getWebviewContent(resultbackend);
     };
 
@@ -304,7 +303,11 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand("furui.next", async () => {
             let page: any = context.globalState.get("page");
-            context.globalState.update("page", page + 1);
+            let total: any = context.globalState.get("total");
+            if (total!=undefined){
+                page = Math.min(total, page+1)
+            }
+            context.globalState.update("page", page);
             vscode.commands.executeCommand("furui.getCode");
         })
     );
@@ -312,7 +315,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand("furui.prev", async () => {
             let page: any = context.globalState.get("page");
-            if (page > 0) {
+            if (page > 1) {
                 context.globalState.update("page", page - 1);
             }
             vscode.commands.executeCommand("furui.getCode");

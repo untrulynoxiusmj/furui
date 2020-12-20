@@ -119,7 +119,6 @@ function activate(context) {
     })));
     let show = (currentPanel) => __awaiter(this, void 0, void 0, function* () {
         console.log("show");
-        let result;
         let page = context.globalState.get("page");
         let token = context.globalState.get("token");
         let tags = context.globalState.get("tags");
@@ -138,6 +137,7 @@ function activate(context) {
         console.log(resultbackend);
         vscode.window.showInformationMessage("Successfully retrieved codes from database");
         console.log(resultbackend.data);
+        context.globalState.update("total", resultbackend.data.total);
         currentPanel.webview.html = getWebviewContent(resultbackend);
     });
     let showProfile = (username) => __awaiter(this, void 0, void 0, function* () {
@@ -248,12 +248,16 @@ function activate(context) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("furui.next", () => __awaiter(this, void 0, void 0, function* () {
         let page = context.globalState.get("page");
-        context.globalState.update("page", page + 1);
+        let total = context.globalState.get("total");
+        if (total != undefined) {
+            page = Math.min(total, page + 1);
+        }
+        context.globalState.update("page", page);
         vscode.commands.executeCommand("furui.getCode");
     })));
     context.subscriptions.push(vscode.commands.registerCommand("furui.prev", () => __awaiter(this, void 0, void 0, function* () {
         let page = context.globalState.get("page");
-        if (page > 0) {
+        if (page > 1) {
             context.globalState.update("page", page - 1);
         }
         vscode.commands.executeCommand("furui.getCode");

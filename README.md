@@ -7,6 +7,8 @@
 	Get Review on your codes
 	Help others
 ```
+[youtube demo](https://www.youtube.com/watch?v=KeXMC_L9n5I)
+[presentation ppt](https://docs.google.com/presentation/d/1RqD1FKR8AqLdu12mRqfF-TaU2nh3EfAntbxjqqNaQ9Y/edit)
 ## Functionalities 
 	- Login with Github
 	- Add new code posts
